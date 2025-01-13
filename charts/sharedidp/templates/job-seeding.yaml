@@ -44,7 +44,7 @@ spec:
           - name: "KEYCLOAK__SHARED__CONNECTIONSTRING"
             value: |
               {{ if .Values.realmSeeding.keycloakServiceTls -}}
-              https://{{ template "sharedidp.fullname" . }}:{{ .Values.realmSeeding.keycloakServicePort }}
+              https://{{ .Values.keycloak.ingress.hostname }}:{{ .Values.realmSeeding.keycloakServicePort }}
               {{- else -}}
               http://{{ template "sharedidp.fullname" . }}:{{ .Values.realmSeeding.keycloakServicePort }}
               {{- end }}
@@ -294,7 +294,7 @@ spec:
             runAsNonRoot: true
             runAsUser: 3000
           {{ if .Values.realmSeeding.keycloakServiceTls -}}
-          command: [ 'sh', '-c', 'until curl -k -s https://{{ template "sharedidp.fullname" . }}:{{ .Values.realmSeeding.keycloakServicePort }}/auth/realms/master/.well-known/openid-configuration; do echo waiting for other pod; sleep 2; done;' ]
+          command: [ 'sh', '-c', 'until curl -s https://{{ .Values.keycloak.ingress.hostname }}:{{ .Values.realmSeeding.keycloakServicePort }}/auth/realms/master/.well-known/openid-configuration; do echo waiting for other pod; sleep 2; done;' ]
           {{- else -}}
           command: [ 'sh', '-c', 'until curl -s http://{{ template "sharedidp.fullname" . }}:{{ .Values.realmSeeding.keycloakServicePort }}/auth/realms/master/.well-known/openid-configuration; do echo waiting for other pod; sleep 2; done;' ]
           {{- end }}
